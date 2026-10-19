@@ -22,13 +22,13 @@
   html,body{height:100%}
   body{
     margin:0; background:#000; color:var(--fg);
-    font-family:var(--mono); font-size:15px; line-height:1.6;
+    font-family:var(--mono); font-size:16px; line-height:1.6;
     display:flex; align-items:center; justify-content:center;
     padding:24px 16px;
     -webkit-font-smoothing:none;
   }
   .screen{
-    position:relative; width:100%; max-width:860px; height:min(78vh,720px);
+    position:relative; width:100%; max-width:1180px; height:min(90vh,1040px);
     background:
       radial-gradient(120% 120% at 50% 40%, rgba(53,240,107,.05), transparent 60%),
       var(--bg);
@@ -45,6 +45,11 @@
   .dot.g{background:#146b32}
   .bar .title{margin-left:8px;color:var(--dim);letter-spacing:.5px}
   .bar .spacer{flex:1}
+  .lang{display:inline-flex;align-items:center;gap:6px;margin-right:12px}
+  .lang .lg{background:none;border:0;color:var(--dim);font:inherit;cursor:pointer;padding:2px 4px;letter-spacing:.5px}
+  .lang .lg:hover{color:var(--bright)}
+  .lang .lg.on{color:var(--hi);font-weight:700;text-shadow:var(--glow)}
+  .lang .sep{color:#16522a}
   .term{
     flex:1 1 auto; overflow-y:auto; padding:18px 18px 8px;
     text-shadow:var(--glow); scrollbar-width:thin; scrollbar-color:#146b32 transparent;
@@ -104,13 +109,16 @@
   <main class="screen" aria-label="Personal terminal of José Ramón Sahuquillo">
     <div class="bar">
       <span class="dot"></span><span class="dot"></span><span class="dot g"></span>
-      <span class="title">visitor@sahuquillo: ~</span>
+      <span class="title">visitor@jrsahuquillo: ~</span>
       <span class="spacer"></span>
+      <span class="lang" id="lang">
+        <button type="button" class="lg" data-l="en" aria-label="English">EN</button><span class="sep">|</span><button type="button" class="lg" data-l="es" aria-label="Espa&ntilde;ol">ES</button>
+      </span>
       <span class="title" id="clock">--:--</span>
     </div>
     <div class="term" id="term" tabindex="0"></div>
     <form class="inputline" id="form" autocomplete="off">
-      <span class="prompt"><b>visitor@sahuquillo</b>:~$</span>
+      <span class="prompt"><b>visitor@jrsahuquillo</b>:~$</span>
       <span class="inwrap">
         <input id="inp" type="text" aria-label="terminal input" autocapitalize="off" autocorrect="off" spellcheck="false">
         <span class="caret" id="caret" style="position:absolute;left:0;top:2px"></span>
@@ -126,44 +134,109 @@
   var inp=document.getElementById('inp');
   var caret=document.getElementById('caret');
 
-  var DATA={
+  var BASE={
     name:"José Ramón Sahuquillo",
-    role:"Software Engineer · Ruby on Rails",
     company:"237 Global",
-    loc:"Valencia, Spain · Remote",
-    since:2017,
-    motto:"If I don't know how to do it, I don't know how to do it YET.",
-    about:[
-      "Software Engineer at 237 Global, working remotely from Valencia, Spain.",
-      "Building with Ruby on Rails professionally since 2017 — backend features,",
-      "database design, business logic, and the tooling that turns app designs",
-      "into production-ready configurations consumed by mobile apps.",
-      "",
-      "I work with AI agents and assisted workflows as a daily driver —",
-      "scaffolding, refactoring, generating and reviewing tests — while keeping",
-      "the architecture and the final call my own. Strong fundamentals are what",
-      "make that leverage reliable.",
-      "",
-      "I care about clean code, TDD, and getting the small details right."
-    ],
-    experience:[
-      ["237 Global","Software Engineer","2022 — present"],
-      ["DIGITAL55","Backend / Frontend Developer","2020 — 2022"],
-      ["The Cocktail","Ruby on Rails Developer","2017 — 2020"]
-    ],
-    skills:{
-      "Languages":["Ruby","JavaScript","HTML5","CSS"],
-      "Frameworks":["Ruby on Rails","Tailwind CSS"],
-      "Data":["PostgreSQL"],
-      "Tooling":["Git","TDD","AI-assisted workflows"]
-    },
-    langs:[["Spanish","native"],["Valencian","—"],["English","professional"]],
     links:[
-      ["website","https://jrsahuquillo.github.io"],
+      ["web","https://jrsahuquillo.github.io"],
       ["linkedin","https://www.linkedin.com/in/jrsahuquillo/"],
       ["x / twitter","https://x.com/jrsahuquillo"]
-    ]
+    ],
+    fw:["Ruby on Rails","Tailwind CSS"],
+    db:["PostgreSQL"]
   };
+
+  var L={
+    en:{
+      role:"Software Engineer · Ruby on Rails",
+      loc:"Valencia, Spain · Remote",
+      motto:"If I don't know how to do it, I don't know how to do it YET.",
+      title:"ruby · rails · backend · valencia",
+      about:[
+        "Software Engineer at 237 Global, working remotely from Valencia, Spain.",
+        "Building with Ruby on Rails professionally since 2017 — backend features,",
+        "database design, business logic, and the tooling that turns app designs",
+        "into production-ready configurations consumed by mobile apps.",
+        "",
+        "I work with AI agents and assisted workflows as a daily driver —",
+        "scaffolding, refactoring, generating and reviewing tests — while keeping",
+        "the architecture and the final call my own. Strong fundamentals are what",
+        "make that leverage reliable.",
+        "",
+        "I care about clean code, TDD, and getting the small details right."
+      ],
+      experience:[
+        ["237 Global","Software Engineer","2022 — present"],
+        ["DIGITAL55","Backend / Frontend Developer","2020 — 2022"],
+        ["The Cocktail","Ruby on Rails Developer","2017 — 2020"]
+      ],
+      skills:[
+        ["Languages",["Ruby","JavaScript","HTML5","CSS"]],
+        ["Frameworks",BASE.fw],
+        ["Data",BASE.db],
+        ["Tooling",["Git","TDD","AI-assisted workflows"]]
+      ],
+      langs:[["Spanish","native"],["Valencian","—"],["English","professional"]],
+      helpHead:"available commands:",
+      help:[
+        ["about","who I am"],["whoami","the one-liner"],["experience","where I have worked"],
+        ["skills","my stack"],["languages","human languages"],["motto","words to code by"],
+        ["contact","how to reach me"],["clear","wipe the screen"],["help","this list"]
+      ],
+      hint:'<span class="dim">type</span> <span class="cmd">help</span> <span class="dim">to begin, or click a command below.</span>',
+      boot:["SahuquilloOS 1.0  ·  booting…","[ ok ]  mounting /experience","[ ok ]  loading ruby, rails, postgres","[ ok ]  warming phosphor tube"],
+      notfound:function(k){return '<span class="amber">command not found:</span> '+k+' <span class="dim">— type</span> <span class="cmd">help</span>';},
+      sudo:'<span class="amber">Permission denied:</span> <span class="dim">you are not root (yet).</span>',
+      exit:'<span class="dim">There is no exit. Only more code.</span>'
+    },
+    es:{
+      role:"Ingeniero de Software · Ruby on Rails",
+      loc:"Valencia, España · Remoto",
+      motto:"Si no sé cómo hacerlo, es que aún no sé cómo hacerlo.",
+      title:"ruby · rails · backend · valencia",
+      about:[
+        "Ingeniero de Software en 237 Global, trabajando en remoto desde Valencia.",
+        "Construyo con Ruby on Rails profesionalmente desde 2017 — features de",
+        "backend, diseño de base de datos, lógica de negocio y el tooling que",
+        "convierte diseños de apps en configuraciones listas para producción que",
+        "consumen las apps móviles.",
+        "",
+        "Trabajo con agentes de IA y flujos asistidos como herramienta diaria —",
+        "scaffolding, refactor, generar y revisar tests — manteniendo la",
+        "arquitectura y la última decisión en mi mano. Unos buenos fundamentos",
+        "son lo que hace fiable esa palanca.",
+        "",
+        "Me importa el código limpio, el TDD y cuidar los detalles."
+      ],
+      experience:[
+        ["237 Global","Ingeniero de Software","2022 — actualidad"],
+        ["DIGITAL55","Desarrollador Backend / Frontend","2020 — 2022"],
+        ["The Cocktail","Desarrollador Ruby on Rails","2017 — 2020"]
+      ],
+      skills:[
+        ["Lenguajes",["Ruby","JavaScript","HTML5","CSS"]],
+        ["Frameworks",BASE.fw],
+        ["Datos",BASE.db],
+        ["Herramientas",["Git","TDD","flujos con IA"]]
+      ],
+      langs:[["Español","nativo"],["Valenciano","—"],["Inglés","profesional"]],
+      helpHead:"comandos disponibles:",
+      help:[
+        ["about","quién soy"],["whoami","el resumen"],["experience","dónde he trabajado"],
+        ["skills","mi stack"],["languages","idiomas"],["motto","mi lema"],
+        ["contact","cómo contactarme"],["clear","limpiar pantalla"],["help","esta lista"]
+      ],
+      hint:'<span class="dim">escribe</span> <span class="cmd">help</span> <span class="dim">para empezar, o pulsa un comando abajo.</span>',
+      boot:["SahuquilloOS 1.0  ·  arrancando…","[ ok ]  montando /experiencia","[ ok ]  cargando ruby, rails, postgres","[ ok ]  calentando tubo de fósforo"],
+      notfound:function(k){return '<span class="amber">comando no encontrado:</span> '+k+' <span class="dim">— escribe</span> <span class="cmd">help</span>';},
+      sudo:'<span class="amber">Permiso denegado:</span> <span class="dim">aún no eres root.</span>',
+      exit:'<span class="dim">No hay salida. Solo más código.</span>'
+    }
+  };
+
+  var lang='en';
+  try{var sv=localStorage.getItem('lang'); if(sv==='en'||sv==='es'){lang=sv;} else if((navigator.language||'').toLowerCase().indexOf('es')===0){lang='es';}}catch(e){}
+  function T(){return L[lang];}
 
   function el(cls,html){var d=document.createElement('div');if(cls)d.className=cls;if(html!=null)d.innerHTML=html;return d;}
   function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
@@ -171,26 +244,13 @@
   function printLine(html,cls){print(el('line'+(cls?' '+cls:''),html));}
   function blank(){printLine('&nbsp;');}
 
-  var banner =
-'┌────────────────────────────────────────────┐\n'+
-'│   j r s a h u q u i l l o                    │\n'+
-'│   ruby · rails · backend · valencia          │\n'+
-'└────────────────────────────────────────────┘';
+  function bannerLine(){return '<span class="bright">▓▓ jrsahuquillo</span> <span class="dim">— '+esc(T().title)+'</span>';}
+  function nameLine(){return '<span class="hi">'+esc(BASE.name)+'</span> <span class="dim">— '+esc(T().role)+'</span>';}
+  function coLine(){return esc(BASE.company)+'  ·  '+esc(T().loc);}
 
   function printHelp(){
-    printLine('available commands:','dim');
-    var cmds=[
-      ['about','who I am'],
-      ['whoami','the one-liner'],
-      ['experience','where I have worked'],
-      ['skills','my stack'],
-      ['languages','human languages'],
-      ['motto','words to code by'],
-      ['contact','how to reach me'],
-      ['clear','wipe the screen'],
-      ['help','this list']
-    ];
-    cmds.forEach(function(c){
+    printLine(esc(T().helpHead),'dim');
+    T().help.forEach(function(c){
       printLine('  <span class="cmd">'+c[0]+'</span>'+' '.repeat(Math.max(1,13-c[0].length))+'<span class="dim">'+esc(c[1])+'</span>');
     });
     var chips=el('chips');
@@ -202,35 +262,28 @@
 
   var CMD={
     help:printHelp,
-    "?":printHelp,
     whoami:function(){
-      printLine('<span class="hi">'+esc(DATA.name)+'</span> — '+esc(DATA.role)+' @ '+esc(DATA.company));
-      printLine('<span class="dim">'+esc(DATA.loc)+'</span>');
+      printLine('<span class="hi">'+esc(BASE.name)+'</span> — '+esc(T().role)+' @ '+esc(BASE.company));
+      printLine('<span class="dim">'+esc(T().loc)+'</span>');
     },
-    about:function(){
-      DATA.about.forEach(function(l){printLine(l?esc(l):'&nbsp;');});
-    },
+    about:function(){ T().about.forEach(function(l){printLine(l?esc(l):'&nbsp;');}); },
     experience:function(){
-      DATA.experience.forEach(function(r){
+      T().experience.forEach(function(r){
         printLine('<span class="bright">'+esc(r[0])+'</span>');
         printLine('  <span class="dim">'+esc(r[1])+'  ·  '+esc(r[2])+'</span>');
       });
     },
-    history:function(){CMD.experience();},
     skills:function(){
-      Object.keys(DATA.skills).forEach(function(k){
-        printLine('<span class="amber">'+esc(k)+'</span>  <span class="dim">'+DATA.skills[k].map(esc).join(' · ')+'</span>');
+      T().skills.forEach(function(g){
+        printLine('<span class="amber">'+esc(g[0])+'</span>  <span class="dim">'+g[1].map(esc).join(' · ')+'</span>');
       });
     },
-    stack:function(){CMD.skills();},
     languages:function(){
-      DATA.langs.forEach(function(l){printLine('<span class="bright">'+esc(l[0])+'</span> <span class="dim">— '+esc(l[1])+'</span>');});
+      T().langs.forEach(function(l){printLine('<span class="bright">'+esc(l[0])+'</span> <span class="dim">— '+esc(l[1])+'</span>');});
     },
-    motto:function(){
-      printLine('<span class="hi">"'+esc(DATA.motto)+'"</span>');
-    },
+    motto:function(){ printLine('<span class="hi">"'+esc(T().motto)+'"</span>'); },
     contact:function(){
-      DATA.links.forEach(function(l){
+      BASE.links.forEach(function(l){
         printLine('<span class="dim">'+l[0]+'</span>'+' '.repeat(Math.max(1,14-l[0].length))+'<a href="'+l[1]+'" target="_blank" rel="noopener">'+esc(l[1])+'</a>');
       });
     },
@@ -238,18 +291,26 @@
       printLine('<span class="cmd">about.txt  experience.log  skills.json  languages.txt  contact.md  motto.txt</span>');
     },
     clear:function(){term.innerHTML='';},
-    sudo:function(){printLine('<span class="amber">Permission denied:</span> <span class="dim">you are not root (yet).</span>');},
-    exit:function(){printLine('<span class="dim">There is no exit. Only more code.</span>');}
+    sudo:function(){printLine(T().sudo);},
+    exit:function(){printLine(T().exit);}
+  };
+
+  var ALIAS={
+    "?":"help", history:"experience", stack:"skills",
+    ayuda:"help", acerca:"about", sobre:"about", experiencia:"experience",
+    habilidades:"skills", idiomas:"languages", lema:"motto", contacto:"contact",
+    limpiar:"clear", salir:"exit"
   };
 
   function run(raw){
     var cmd=(raw||'').trim();
-    printLine('<span class="prompt"><b>visitor@sahuquillo</b>:~$</span> '+esc(cmd));
+    printLine('<span class="prompt"><b>visitor@jrsahuquillo</b>:~$</span> '+esc(cmd));
     if(!cmd){return;}
     hist.push(cmd); hp=hist.length;
     var key=cmd.split(/\s+/)[0].toLowerCase();
+    key=ALIAS[key]||key;
     if(CMD[key]){ CMD[key](); }
-    else { printLine('<span class="amber">command not found:</span> '+esc(key)+' <span class="dim">— type</span> <span class="cmd">help</span>'); }
+    else { printLine(T().notfound(esc(cmd.split(/\s+/)[0]))); }
     blank();
   }
 
@@ -264,49 +325,61 @@
   function measure(txt){var s=document.createElement('span');s.style.cssText='position:absolute;visibility:hidden;white-space:pre;font:inherit';s.textContent=txt;inp.parentNode.appendChild(s);var w=s.offsetWidth;s.remove();return w;}
   function syncCaret(){caret.style.left=Math.min(measure(inp.value),inp.offsetWidth-2)+'px';}
   function focusInp(){inp.focus();}
-  document.addEventListener('click',function(e){if(!e.target.closest('a')&&!e.target.closest('.chip'))focusInp();});
+  document.addEventListener('click',function(e){if(!e.target.closest('a')&&!e.target.closest('.chip')&&!e.target.closest('.lang'))focusInp();});
 
-  // clock
   function tick(){var d=new Date();document.getElementById('clock').textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
   tick(); setInterval(tick,15000);
 
+  // language toggle
+  var langBox=document.getElementById('lang');
+  function paintToggle(){[].forEach.call(langBox.querySelectorAll('.lg'),function(b){b.classList.toggle('on', b.getAttribute('data-l')===lang);});}
+  function printIntro(){
+    printLine(bannerLine(),'line ascii'); blank();
+    printLine(nameLine(),'line'); printLine(coLine(),'line dim'); blank();
+    printLine(T().hint,'line'); blank();
+    printHelp(); blank();
+  }
+  function setLang(l){
+    if(l===lang){focusInp();return;}
+    lang=l; try{localStorage.setItem('lang',l);}catch(e){}
+    paintToggle(); term.innerHTML=''; printIntro(); focusInp();
+  }
+  langBox.addEventListener('click',function(e){var b=e.target.closest('.lg');if(b)setLang(b.getAttribute('data-l'));});
+  paintToggle();
+
   // boot sequence (typed)
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  var boot=[
-    {t:'line dim',s:'SahuquilloOS 1.0  ·  booting…'},
-    {t:'line dim',s:'[ ok ]  mounting /experience'},
-    {t:'line dim',s:'[ ok ]  loading ruby, rails, postgres'},
-    {t:'line dim',s:'[ ok ]  warming phosphor tube'},
-    {t:'blank'},
-    {t:'line ascii',s:'<span class="bright">▓▓ jrsahuquillo</span> <span class="dim">— ruby · rails · backend · valencia</span>'},
-    {t:'blank'},
-    {t:'line',s:'<span class="hi">'+esc(DATA.name)+'</span> <span class="dim">— '+esc(DATA.role)+'</span>'},
-    {t:'line dim',s:esc(DATA.company)+'  ·  '+esc(DATA.loc)},
-    {t:'blank'},
-    {t:'line',s:'<span class="dim">type</span> <span class="cmd">help</span> <span class="dim">to begin, or click a command below.</span>'}
-  ];
-
   function typeLine(text,cls,done){
     var node=el(cls); print(node);
     if(reduce){node.innerHTML=text;done();return;}
     var i=0, plain=/[<&]/.test(text);
-    if(plain){ node.innerHTML=text; done(); return; } // html lines render instantly
+    if(plain){ node.innerHTML=text; done(); return; }
     (function step(){
       node.textContent=text.slice(0,i++);
       term.scrollTop=term.scrollHeight;
       if(i<=text.length){setTimeout(step,12);}else{done();}
     })();
   }
-
-  function playBoot(k){
-    if(k>=boot.length){ printHelp(); blank(); focusInp(); return; }
-    var b=boot[k];
-    if(b.t==='blank'){blank();setTimeout(function(){playBoot(k+1);},60);return;}
-    typeLine(b.s, b.t, function(){ setTimeout(function(){playBoot(k+1);}, reduce?0:70); });
+  function playBoot(){
+    var seq=[]; 
+    T().boot.forEach(function(s,i){seq.push({t:(i===0?'line dim':'line dim'),s:s});});
+    seq.push({t:'blank'});
+    seq.push({t:'line ascii',s:bannerLine()});
+    seq.push({t:'blank'});
+    seq.push({t:'line',s:nameLine()});
+    seq.push({t:'line dim',s:coLine()});
+    seq.push({t:'blank'});
+    seq.push({t:'line',s:T().hint});
+    (function step(k){
+      if(k>=seq.length){ printHelp(); blank(); focusInp(); return; }
+      var b=seq[k];
+      if(b.t==='blank'){blank();setTimeout(function(){step(k+1);},60);return;}
+      typeLine(b.s,b.t,function(){setTimeout(function(){step(k+1);},reduce?0:70);});
+    })(0);
   }
 
   syncCaret();
-  playBoot(0);
+  playBoot();
 })();
 </script>
 </body>
