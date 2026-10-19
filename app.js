@@ -10,6 +10,18 @@
   var busy = false;  // true while the terminal is generating output
   var skip = false;  // set on interaction to fast-forward the animation
 
+  var srLive = document.getElementById('sr-live');
+  // Announce finished lines to screen readers (the typed partials are hidden)
+  function announce(text) {
+    if (!srLive) { return; }
+    var t = String(text || '').replace(/\u00a0/g, ' ').trim();
+    if (!t) { return; }
+    var line = document.createElement('div');
+    line.textContent = t;
+    srLive.appendChild(line);
+    while (srLive.childNodes.length > 30) { srLive.removeChild(srLive.firstChild); }
+  }
+
   var AVATAR = 'assets/avatar.png';
 
   // ----- Static data (language independent) -----
@@ -272,17 +284,18 @@
     if (busy) { skip = true; return; }
     var cmd = (raw || '').trim();
     print(el('line', '<span class="prompt"><b>visitor@jrsahuquillo</b>:~$</span> ' + esc(cmd)));
+    announce(cmd);
     if (!cmd) { return; }
     history.push(cmd);
     historyPos = history.length;
     var word = cmd.split(/\s+/)[0].toLowerCase();
     var key = ALIAS[word] || word;
     if (key === 'photo') { // reveal the portrait line by line instead of all at once
-      busy = true;
+      setBusy(true);
       skip = false;
       revealAvatar(term, function () {
         blank();
-        busy = false;
+        setBusy(false);
         focusInp();
       });
       return;
@@ -291,11 +304,11 @@
     sink = lines;
     if (CMD[key]) { CMD[key](); } else { printLine(T().notfound(esc(word))); }
     sink = null;
-    busy = true;
+    setBusy(true);
     skip = false;
     playLines(lines, 7, function () {
       blank();
-      busy = false;
+      setBusy(false);
       focusInp();
     });
   }
@@ -342,6 +355,13 @@
   }
   var coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
   function focusInp() { if (coarse) { return; } inp.focus(); }
+
+  // Toggle the generating state and the visible skip control together
+  function setBusy(v) {
+    busy = v;
+    var s = document.getElementById('skip');
+    if (s) { s.hidden = !v; }
+  }
 
   document.addEventListener('click', function (e) {
     if (coarse) { return; }
@@ -410,6 +430,9 @@
     });
   }
 
+  var skipBtn = document.getElementById('skip');
+  if (skipBtn) { skipBtn.addEventListener('click', function () { skip = true; }); }
+
   // Quick command bar — primary navigation, especially on touch
   var cmdbar = document.getElementById('cmdbar');
   ['about', 'experience', 'skills', 'languages', 'contact', 'photo', 'motto'].forEach(function (k) {
@@ -432,18 +455,21 @@
   // Type a line character by character, then swap in the colored markup.
   function typeNode(node, html, speed, done) {
     var text = htmlToText(html);
+    function finish() { announce(text); done(); }
     if (reduce || text.replace(/\u00a0/g, '').trim() === '') {
       node.innerHTML = html;
-      done();
+      finish();
       return;
     }
     node.classList.add('typing');
+    node.setAttribute('aria-hidden', 'true'); // hide the partial line from screen readers
     var i = 0;
     (function step() {
       if (skip) {
         node.classList.remove('typing');
+        node.removeAttribute('aria-hidden');
         node.innerHTML = html;
-        done();
+        finish();
         return;
       }
       node.textContent = text.slice(0, i++);
@@ -452,8 +478,9 @@
         setTimeout(step, speed);
       } else {
         node.classList.remove('typing');
+        node.removeAttribute('aria-hidden');
         node.innerHTML = html;
-        done();
+        finish();
       }
     })();
   }
@@ -580,7 +607,7 @@
   }
 
   function playBoot() {
-    busy = true;
+    setBusy(true);
     skip = false;
     var row = el('line bootrow');
     var titleEl = document.createElement('span');
@@ -612,7 +639,7 @@
               sink = null;
               playLines(helpLines, 9, function () {
                 blank();
-                busy = false;
+                setBusy(false);
                 focusInp();
               });
             });

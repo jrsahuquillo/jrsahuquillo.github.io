@@ -5,6 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>José Ramón Sahuquillo — Software Engineer</title>
   <meta name="description" content="Ruby on Rails backend engineer since 2017 — clean code, TDD and AI-assisted workflows. Remote from Valencia, Spain.">
+  <link rel="canonical" href="https://jrsahuquillo.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jrsahuquillo.github.io/">
+  <meta property="og:title" content="José Ramón Sahuquillo — Software Engineer">
+  <meta property="og:description" content="Ruby on Rails backend engineer since 2017 — clean code, TDD and AI-assisted workflows. Remote from Valencia, Spain.">
+  <meta property="og:image" content="https://jrsahuquillo.github.io/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="José Ramón Sahuquillo — Software Engineer">
+  <meta name="twitter:description" content="Ruby on Rails backend engineer since 2017 — clean code, TDD and AI-assisted workflows. Remote from Valencia, Spain.">
+  <meta name="twitter:image" content="https://jrsahuquillo.github.io/assets/og.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "José Ramón Sahuquillo",
+    "url": "https://jrsahuquillo.github.io/",
+    "image": "https://jrsahuquillo.github.io/assets/og.png",
+    "jobTitle": "Software Engineer",
+    "worksFor": { "@type": "Organization", "name": "237 Global" },
+    "address": { "@type": "PostalAddress", "addressLocality": "Valencia", "addressCountry": "ES" },
+    "knowsAbout": ["Ruby on Rails", "Ruby", "PostgreSQL", "JavaScript", "AWS", "Backend development", "TDD"],
+    "sameAs": [
+      "https://www.linkedin.com/in/jrsahuquillo/",
+      "https://github.com/jrsahuquillo",
+      "https://x.com/jrsahuquillo"
+    ]
+  }
+  </script>
   <link rel="icon" id="favicon" href="data:,">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -18,11 +48,13 @@
       <span class="lang" id="lang">
         <button type="button" class="lg" data-l="en" aria-label="English">EN</button><span class="sep">|</span><button type="button" class="lg" data-l="es" aria-label="Español">ES</button>
       </span>
+      <button type="button" class="rbt skipbtn" id="skip" title="Skip intro" hidden>skip &#9656;</button>
       <button type="button" class="rbt" id="reboot" title="Reboot">&#x21bb; reboot</button>
       <span class="title" id="clock">--:--</span>
     </div>
 
-    <div class="term" id="term" tabindex="0"></div>
+    <div class="term" id="term" tabindex="0" aria-label="Terminal output"></div>
+    <div id="sr-live" class="sr-only" aria-live="polite" aria-atomic="false"></div>
 
     <nav class="cmdbar" id="cmdbar" aria-label="Commands"></nav>
 

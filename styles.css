@@ -103,6 +103,9 @@ body {
   letter-spacing: .3px;
 }
 .rbt:hover { color: var(--hi); border-color: var(--bright); text-shadow: var(--glow); }
+.skipbtn { color: var(--amber); border-color: #5a4a12; }
+.skipbtn:hover { color: var(--hi); border-color: var(--amber); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 /* Terminal body */
 .term {
