@@ -829,10 +829,11 @@
         print(node);
         node.classList.add('typing');
         function render(label, pct) {
+          var pctStr = ('   ' + pct).slice(-3); // fixed width so it never shifts
           node.innerHTML =
-            '<span class="dim">' + esc(label) + '</span>  ' +
-            '<span class="bright">' + loaderBar(pct) + '</span> ' +
-            '<span class="amber">' + pct + '%</span>';
+            '<span class="bright">[' + loaderBar(pct) + ']</span> ' +
+            '<span class="amber">' + pctStr + '%</span>  ' +
+            '<span class="dim">' + esc(label) + '</span>';
           term.scrollTop = term.scrollHeight;
         }
         var i = 0;
