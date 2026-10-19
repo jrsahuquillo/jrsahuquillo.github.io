@@ -926,10 +926,15 @@
                 { t: 'blank' },
                 { t: 'line', s: T().hint }
               ], 12, function () {
+                var helpLines = [];
+                sink = helpLines;
                 printHelp();
-                blank();
-                busy = false;
-                focusInp();
+                sink = null;
+                playLines(helpLines, 9, function () {
+                  blank();
+                  busy = false;
+                  focusInp();
+                });
               });
             });
           });
