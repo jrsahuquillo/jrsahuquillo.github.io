@@ -189,7 +189,7 @@
     return '<span class="hi">' + esc(BASE.name) + '</span> <span class="dim">— ' + esc(T().role) + '</span>';
   }
   function coLine() {
-    return esc(BASE.company) + '  ·  ' + esc(T().loc);
+    return esc(BASE.company) + ' · ' + esc(T().loc);
   }
 
   function printHelp() {
