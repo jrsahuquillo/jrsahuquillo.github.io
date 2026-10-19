@@ -55,6 +55,7 @@
         ['Languages', ['Ruby', 'JavaScript', 'HTML5', 'CSS']],
         ['Frameworks', BASE.fw],
         ['Data', BASE.db],
+        ['Cloud', ['AWS']],
         ['Tooling', ['Git', 'TDD', 'AI-assisted workflows']]
       ],
       langs: [['Spanish', 'native'], ['Valencian', 'native'], ['English', 'professional']],
@@ -110,6 +111,7 @@
         ['Lenguajes', ['Ruby', 'JavaScript', 'HTML5', 'CSS']],
         ['Frameworks', BASE.fw],
         ['Datos', BASE.db],
+        ['Nube', ['AWS']],
         ['Herramientas', ['Git', 'TDD', 'flujos con IA']]
       ],
       langs: [['Español', 'nativo'], ['Valenciano', 'nativo'], ['Inglés', 'profesional']],
