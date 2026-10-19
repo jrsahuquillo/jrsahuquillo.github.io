@@ -57,7 +57,7 @@
         ['Data', BASE.db],
         ['Tooling', ['Git', 'TDD', 'AI-assisted workflows']]
       ],
-      langs: [['Spanish', 'native'], ['Valencian', '—'], ['English', 'professional']],
+      langs: [['Spanish', 'native'], ['Valencian', 'native'], ['English', 'professional']],
       helpHead: 'available commands:',
       help: [
         ['about', 'who I am'],
@@ -112,7 +112,7 @@
         ['Datos', BASE.db],
         ['Herramientas', ['Git', 'TDD', 'flujos con IA']]
       ],
-      langs: [['Español', 'nativo'], ['Valenciano', '—'], ['Inglés', 'profesional']],
+      langs: [['Español', 'nativo'], ['Valenciano', 'nativo'], ['Inglés', 'profesional']],
       helpHead: 'comandos disponibles:',
       help: [
         ['about', 'quién soy'],
