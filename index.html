@@ -50,6 +50,12 @@
   .lang .lg:hover{color:var(--bright)}
   .lang .lg.on{color:var(--hi);font-weight:700;text-shadow:var(--glow)}
   .lang .sep{color:#16522a}
+  .rbt{background:none;border:1px solid #16522a;color:var(--dim);font:inherit;font-size:12px;cursor:pointer;border-radius:6px;padding:3px 10px;margin-right:12px;letter-spacing:.3px}
+  .rbt:hover{color:var(--hi);border-color:var(--bright);text-shadow:var(--glow)}
+  .avatar{position:relative;display:inline-block;margin:2px 0 12px}
+  .avatar img{display:block;width:150px;height:150px;image-rendering:pixelated;border:1px solid #16522a;border-radius:6px}
+  .avatar::after{content:"";position:absolute;inset:0;border-radius:6px;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 2px,rgba(0,0,0,.22) 2px 3px);box-shadow:inset 0 0 22px rgba(0,0,0,.55)}
+  @media (max-width:560px){.avatar img{width:116px;height:116px}}
   .term{
     flex:1 1 auto; overflow-y:auto; padding:18px 18px 8px;
     text-shadow:var(--glow); scrollbar-width:thin; scrollbar-color:#146b32 transparent;
@@ -114,6 +120,7 @@
       <span class="lang" id="lang">
         <button type="button" class="lg" data-l="en" aria-label="English">EN</button><span class="sep">|</span><button type="button" class="lg" data-l="es" aria-label="Espa&ntilde;ol">ES</button>
       </span>
+      <button type="button" class="rbt" id="reboot" title="Reboot">&#x21bb; reboot</button>
       <span class="title" id="clock">--:--</span>
     </div>
     <div class="term" id="term" tabindex="0"></div>
@@ -133,6 +140,7 @@
   var form=document.getElementById('form');
   var inp=document.getElementById('inp');
   var caret=document.getElementById('caret');
+  var AVATAR='data:image/png;base64,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';
 
   var BASE={
     name:"José Ramón Sahuquillo",
@@ -181,7 +189,7 @@
       help:[
         ["about","who I am"],["whoami","the one-liner"],["experience","where I have worked"],
         ["skills","my stack"],["languages","human languages"],["motto","words to code by"],
-        ["contact","how to reach me"],["clear","wipe the screen"],["help","this list"]
+        ["contact","how to reach me"],["photo","my mugshot"],["clear","wipe the screen"],["help","this list"]
       ],
       hint:'<span class="dim">type</span> <span class="cmd">help</span> <span class="dim">to begin, or click a command below.</span>',
       boot:["SahuquilloOS 1.0  ·  booting…","[ ok ]  mounting /experience","[ ok ]  loading ruby, rails, postgres","[ ok ]  warming phosphor tube"],
@@ -224,7 +232,7 @@
       help:[
         ["about","quién soy"],["whoami","el resumen"],["experience","dónde he trabajado"],
         ["skills","mi stack"],["languages","idiomas"],["motto","mi lema"],
-        ["contact","cómo contactarme"],["clear","limpiar pantalla"],["help","esta lista"]
+        ["contact","cómo contactarme"],["photo","mi careto"],["clear","limpiar pantalla"],["help","esta lista"]
       ],
       hint:'<span class="dim">escribe</span> <span class="cmd">help</span> <span class="dim">para empezar, o pulsa un comando abajo.</span>',
       boot:["SahuquilloOS 1.0  ·  arrancando…","[ ok ]  montando /experiencia","[ ok ]  cargando ruby, rails, postgres","[ ok ]  calentando tubo de fósforo"],
@@ -235,7 +243,7 @@
   };
 
   var lang='en';
-  try{var sv=localStorage.getItem('lang'); if(sv==='en'||sv==='es'){lang=sv;} else if((navigator.language||'').toLowerCase().indexOf('es')===0){lang='es';}}catch(e){}
+  try{var sv=localStorage.getItem('lang'); if(sv==='en'||sv==='es'){lang=sv;}}catch(e){}
   function T(){return L[lang];}
 
   function el(cls,html){var d=document.createElement('div');if(cls)d.className=cls;if(html!=null)d.innerHTML=html;return d;}
@@ -243,6 +251,7 @@
   function print(node){term.appendChild(node);term.scrollTop=term.scrollHeight;}
   function printLine(html,cls){print(el('line'+(cls?' '+cls:''),html));}
   function blank(){printLine('&nbsp;');}
+  function avatarNode(){var w=el('avatar');var im=document.createElement('img');im.src=AVATAR;im.alt='José Ramón Sahuquillo';im.loading='eager';w.appendChild(im);return w;}
 
   function bannerLine(){return '<span class="bright">▓▓ jrsahuquillo</span> <span class="dim">— '+esc(T().title)+'</span>';}
   function nameLine(){return '<span class="hi">'+esc(BASE.name)+'</span> <span class="dim">— '+esc(T().role)+'</span>';}
@@ -290,6 +299,7 @@
     ls:function(){
       printLine('<span class="cmd">about.txt  experience.log  skills.json  languages.txt  contact.md  motto.txt</span>');
     },
+    photo:function(){ print(avatarNode()); },
     clear:function(){term.innerHTML='';},
     sudo:function(){printLine(T().sudo);},
     exit:function(){printLine(T().exit);}
@@ -299,7 +309,7 @@
     "?":"help", history:"experience", stack:"skills",
     ayuda:"help", acerca:"about", sobre:"about", experiencia:"experience",
     habilidades:"skills", idiomas:"languages", lema:"motto", contacto:"contact",
-    limpiar:"clear", salir:"exit"
+    limpiar:"clear", salir:"exit", foto:"photo", me:"photo"
   };
 
   function run(raw){
@@ -334,6 +344,7 @@
   var langBox=document.getElementById('lang');
   function paintToggle(){[].forEach.call(langBox.querySelectorAll('.lg'),function(b){b.classList.toggle('on', b.getAttribute('data-l')===lang);});}
   function printIntro(){
+    print(avatarNode());
     printLine(bannerLine(),'line ascii'); blank();
     printLine(nameLine(),'line'); printLine(coLine(),'line dim'); blank();
     printLine(T().hint,'line'); blank();
@@ -346,6 +357,7 @@
   }
   langBox.addEventListener('click',function(e){var b=e.target.closest('.lg');if(b)setLang(b.getAttribute('data-l'));});
   paintToggle();
+  var rbtn=document.getElementById('reboot'); if(rbtn){rbtn.addEventListener('click',function(){term.innerHTML='';playBoot();});}
 
   // boot sequence (typed)
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -362,8 +374,9 @@
   }
   function playBoot(){
     var seq=[]; 
-    T().boot.forEach(function(s,i){seq.push({t:(i===0?'line dim':'line dim'),s:s});});
+    T().boot.forEach(function(s){seq.push({t:'line dim',s:s});});
     seq.push({t:'blank'});
+    seq.push({t:'avatar'});
     seq.push({t:'line ascii',s:bannerLine()});
     seq.push({t:'blank'});
     seq.push({t:'line',s:nameLine()});
@@ -373,6 +386,7 @@
     (function step(k){
       if(k>=seq.length){ printHelp(); blank(); focusInp(); return; }
       var b=seq[k];
+      if(b.t==='avatar'){print(avatarNode());setTimeout(function(){step(k+1);},reduce?0:140);return;}
       if(b.t==='blank'){blank();setTimeout(function(){step(k+1);},60);return;}
       typeLine(b.s,b.t,function(){setTimeout(function(){step(k+1);},reduce?0:70);});
     })(0);
