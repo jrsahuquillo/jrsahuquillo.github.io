@@ -275,6 +275,16 @@
     historyPos = history.length;
     var word = cmd.split(/\s+/)[0].toLowerCase();
     var key = ALIAS[word] || word;
+    if (key === 'photo') { // reveal the portrait line by line instead of all at once
+      busy = true;
+      skip = false;
+      revealAvatar(term, function () {
+        blank();
+        busy = false;
+        focusInp();
+      });
+      return;
+    }
     var lines = [];
     sink = lines;
     if (CMD[key]) { CMD[key](); } else { printLine(T().notfound(esc(word))); }
