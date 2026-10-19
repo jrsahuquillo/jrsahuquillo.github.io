@@ -75,7 +75,7 @@
       hint: '<span class="dim">type</span> <span class="cmd">help</span> <span class="dim">to begin, or click a command below.</span>',
       loadingWord: 'loading',
       readyWord: 'ready',
-      booting: 'SahuquilloOS 2.0  ·  booting…',
+      booting: 'SahuOS 2.0  ·  booting…',
       notfound: function (k) {
         return '<span class="amber">command not found:</span> ' + k +
           ' <span class="dim">— type</span> <span class="cmd">help</span>';
@@ -131,7 +131,7 @@
       hint: '<span class="dim">escribe</span> <span class="cmd">help</span> <span class="dim">para empezar, o pulsa un comando abajo.</span>',
       loadingWord: 'cargando',
       readyWord: 'listo',
-      booting: 'SahuquilloOS 2.0  ·  arrancando…',
+      booting: 'SahuOS 2.0  ·  arrancando…',
       notfound: function (k) {
         return '<span class="amber">comando no encontrado:</span> ' + k +
           ' <span class="dim">— escribe</span> <span class="cmd">help</span>';
