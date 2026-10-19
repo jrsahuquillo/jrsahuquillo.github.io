@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>José Ramón Sahuquillo — terminal</title>
   <meta name="description" content="José Ramón Sahuquillo — Software Engineer, Ruby on Rails. Personal terminal.">
+  <link rel="icon" id="favicon" href="data:,">
 
   <style>
     /* Embedded font (JetBrains Mono, latin subset) — base64 so the page is fully offline */
@@ -187,6 +188,17 @@
       box-shadow: var(--glow);
     }
     @keyframes blink { 50% { opacity: 0; } }
+    .typing::after {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 1.05em;
+      margin-left: 2px;
+      vertical-align: -2px;
+      background: var(--bright);
+      box-shadow: var(--glow);
+      animation: blink 1.05s steps(1) infinite;
+    }
 
     .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .chip {
@@ -342,6 +354,10 @@
       var form = document.getElementById('form');
       var inp = document.getElementById('inp');
       var caret = document.getElementById('caret');
+
+      var sink = null;   // when an array, printLine collects into it (typed output)
+      var busy = false;  // true while the terminal is generating output
+      var skip = false;  // set on interaction to fast-forward the animation
 
       var AVATAR = 'data:image/png;base64,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';
 
@@ -504,7 +520,9 @@
         term.scrollTop = term.scrollHeight;
       }
       function printLine(html, cls) {
-        print(el('line' + (cls ? ' ' + cls : ''), html));
+        var full = 'line' + (cls ? ' ' + cls : '');
+        if (sink) { sink.push({ html: html, cls: full }); return; }
+        print(el(full, html));
       }
       function blank() { printLine('&nbsp;'); }
 
@@ -604,19 +622,25 @@
       var historyPos = 0;
 
       function run(raw) {
+        if (busy) { skip = true; return; }
         var cmd = (raw || '').trim();
-        printLine('<span class="prompt"><b>visitor@jrsahuquillo</b>:~$</span> ' + esc(cmd));
+        print(el('line', '<span class="prompt"><b>visitor@jrsahuquillo</b>:~$</span> ' + esc(cmd)));
         if (!cmd) { return; }
         history.push(cmd);
         historyPos = history.length;
         var word = cmd.split(/\s+/)[0].toLowerCase();
         var key = ALIAS[word] || word;
-        if (CMD[key]) {
-          CMD[key]();
-        } else {
-          printLine(T().notfound(esc(word)));
-        }
-        blank();
+        var lines = [];
+        sink = lines;
+        if (CMD[key]) { CMD[key](); } else { printLine(T().notfound(esc(word))); }
+        sink = null;
+        busy = true;
+        skip = false;
+        playLines(lines, 7, function () {
+          blank();
+          busy = false;
+          focusInp();
+        });
       }
 
       // ----- Input handling -----
@@ -642,6 +666,10 @@
       });
 
       inp.addEventListener('input', syncCaret);
+
+      function interrupt() { if (busy) { skip = true; } }
+      document.addEventListener('pointerdown', interrupt, true);
+      document.addEventListener('keydown', interrupt, true);
 
       function measure(text) {
         var span = document.createElement('span');
@@ -734,23 +762,56 @@
       // ----- Boot sequence (typewriter) -----
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
-      function typeLine(text, cls, done) {
-        var node = el(cls);
-        print(node);
-        if (reduce || /[<&]/.test(text)) {
-          node.innerHTML = text; // lines with markup render instantly
+      function htmlToText(html) {
+        var d = document.createElement('div');
+        d.innerHTML = html;
+        return d.textContent || '';
+      }
+
+      // Type a line character by character, then swap in the colored markup.
+      function typeNode(node, html, speed, done) {
+        var text = htmlToText(html);
+        if (reduce || text.replace(/\u00a0/g, '').trim() === '') {
+          node.innerHTML = html;
           done();
           return;
         }
+        node.classList.add('typing');
         var i = 0;
         (function step() {
+          if (skip) {
+            node.classList.remove('typing');
+            node.innerHTML = html;
+            done();
+            return;
+          }
           node.textContent = text.slice(0, i++);
           term.scrollTop = term.scrollHeight;
-          if (i <= text.length) { setTimeout(step, 12); } else { done(); }
+          if (i <= text.length) {
+            setTimeout(step, speed);
+          } else {
+            node.classList.remove('typing');
+            node.innerHTML = html;
+            done();
+          }
         })();
       }
 
+      function playLines(items, speed, done) {
+        (function step(k) {
+          if (k >= items.length) { if (done) { done(); } return; }
+          var it = items[k];
+          var node = el(it.cls);
+          print(node);
+          typeNode(node, it.html, speed, function () {
+            setTimeout(function () { step(k + 1); }, (reduce || skip) ? 0 : 40);
+          });
+        })(0);
+      }
+
       function playBoot() {
+        busy = true;
+        skip = false;
         var seq = [];
         T().boot.forEach(function (s) { seq.push({ t: 'line dim', s: s }); });
         seq.push({ t: 'blank' });
@@ -766,25 +827,52 @@
           if (k >= seq.length) {
             printHelp();
             blank();
+            busy = false;
             focusInp();
             return;
           }
           var b = seq[k];
           if (b.t === 'avatar') {
             print(avatarNode());
-            setTimeout(function () { step(k + 1); }, reduce ? 0 : 140);
+            setTimeout(function () { step(k + 1); }, (reduce || skip) ? 0 : 140);
             return;
           }
           if (b.t === 'blank') {
             blank();
-            setTimeout(function () { step(k + 1); }, 60);
+            setTimeout(function () { step(k + 1); }, skip ? 0 : 60);
             return;
           }
-          typeLine(b.s, b.t, function () {
-            setTimeout(function () { step(k + 1); }, reduce ? 0 : 70);
+          var node = el(b.t);
+          print(node);
+          typeNode(node, b.s, 12, function () {
+            setTimeout(function () { step(k + 1); }, (reduce || skip) ? 0 : 70);
           });
         })(0);
       }
+
+      // ----- Blinking-cursor favicon -----
+      (function () {
+        var link = document.getElementById('favicon');
+        if (!link || !document.createElement('canvas').getContext) { return; }
+        var c = document.createElement('canvas');
+        c.width = 64;
+        c.height = 64;
+        var ctx = c.getContext('2d');
+        var on = true;
+        function frame() {
+          ctx.fillStyle = '#040a05';
+          ctx.fillRect(0, 0, 64, 64);
+          ctx.fillStyle = '#35f06b';
+          ctx.font = 'bold 34px monospace';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('>', 6, 36);
+          if (on) { ctx.fillRect(34, 16, 20, 34); }
+          link.href = c.toDataURL('image/png');
+          on = !on;
+        }
+        frame();
+        setInterval(frame, 530);
+      })();
 
       // ----- Start -----
       syncCaret();
