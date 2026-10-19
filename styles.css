@@ -137,8 +137,8 @@ a:hover { color: var(--hi); border-bottom-color: var(--hi); }
 .avatar { position: relative; display: inline-block; margin: 2px 0 12px; }
 .avatar img {
   display: block;
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   image-rendering: pixelated;
   border: 1px solid #16522a;
   border-radius: 6px;
@@ -306,7 +306,7 @@ a:hover { color: var(--hi); border-bottom-color: var(--hi); }
   .inputline { padding: 2px 14px 12px; }
   .links { padding: 10px 14px; gap: 6px 16px; justify-content: space-between; }
   .ascii { font-size: 10px; }
-  .avatar img { width: 120px; height: 120px; }
+  .avatar img { width: 140px; height: 140px; }
   .intro { flex-direction: column; align-items: flex-start; }
   .introtext { width: 100%; }
 }

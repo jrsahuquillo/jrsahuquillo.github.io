@@ -525,7 +525,7 @@
     wrap.appendChild(edge);
     parent.appendChild(wrap);
     term.scrollTop = term.scrollHeight;
-    var full = (window.innerWidth <= 620 ? 120 : 150);
+    var full = (window.innerWidth <= 620 ? 140 : 180);
     function finish() {
       wrap.classList.remove('reveal');
       wrap.style.height = '';
