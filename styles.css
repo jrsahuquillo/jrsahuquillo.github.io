@@ -204,6 +204,7 @@ a:hover { color: var(--hi); border-bottom-color: var(--hi); }
 .intro { display: flex; align-items: center; gap: 16px; margin: 2px 0 8px; }
 .introtext { flex: 1 1 0; min-width: 0; }
 .intro .avatar { margin: 0; flex: 0 0 auto; }
+.introtext .ascii { margin-bottom: 8px; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .chip {
