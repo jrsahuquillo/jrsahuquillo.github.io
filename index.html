@@ -211,6 +211,9 @@
     }
     .bootrow { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 20px; row-gap: 2px; }
     .boot-title, .boot-load { white-space: nowrap; }
+    .intro { display: flex; align-items: center; gap: 16px; margin: 2px 0 8px; }
+    .introtext { flex: 1 1 0; min-width: 0; }
+    .intro .avatar { margin: 0; flex: 0 0 auto; }
 
     .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .chip {
@@ -314,6 +317,8 @@
       .links { padding: 10px 14px; gap: 6px 16px; justify-content: space-between; }
       .ascii { font-size: 10px; }
       .avatar img { width: 120px; height: 120px; }
+      .intro { flex-direction: column; align-items: flex-start; }
+      .introtext { width: 100%; }
     }
     @media (prefers-reduced-motion: reduce) {
       .flick { animation: none; }
@@ -718,11 +723,15 @@
       }
 
       function printIntro() {
-        print(avatarNode());
-        printLine(bannerLine(), 'line ascii');
-        blank();
-        printLine(nameLine(), 'line');
-        printLine(coLine(), 'line dim');
+        var intro = el('intro');
+        intro.appendChild(avatarNode());
+        var textCol = document.createElement('div');
+        textCol.className = 'introtext';
+        var b = el('line ascii'); b.innerHTML = bannerLine(); textCol.appendChild(b);
+        var n = el('line'); n.innerHTML = nameLine(); textCol.appendChild(n);
+        var c = el('line dim'); c.innerHTML = coLine(); textCol.appendChild(c);
+        intro.appendChild(textCol);
+        print(intro);
         blank();
         printLine(T().hint, 'line');
         blank();
@@ -861,7 +870,7 @@
       }
 
       // Draw the portrait top-to-bottom, like it is being rendered line by line
-      function revealAvatar(done) {
+      function revealAvatar(parent, done) {
         var wrap = el('avatar reveal');
         var img = document.createElement('img');
         img.src = AVATAR;
@@ -870,7 +879,8 @@
         var edge = document.createElement('span');
         edge.className = 'scanedge';
         wrap.appendChild(edge);
-        print(wrap);
+        parent.appendChild(wrap);
+        term.scrollTop = term.scrollHeight;
         var full = (window.innerWidth <= 620 ? 120 : 150);
         function finish() {
           wrap.classList.remove('reveal');
@@ -909,6 +919,20 @@
         })(0);
       }
 
+      // Like typeSeq, but appends the typed lines into a given parent element.
+      function typeInto(parent, items, speed, done) {
+        (function step(k) {
+          if (k >= items.length) { done(); return; }
+          var b = items[k];
+          var node = el(b.t);
+          parent.appendChild(node);
+          typeNode(node, b.s, speed, function () {
+            term.scrollTop = term.scrollHeight;
+            setTimeout(function () { step(k + 1); }, (reduce || skip) ? 0 : 70);
+          });
+        })(0);
+      }
+
       function playBoot() {
         busy = true;
         skip = false;
@@ -923,23 +947,28 @@
         typeNode(titleEl, esc(T().booting), 14, function () {
           playLoader(loadEl, function () {
             blank();
-            revealAvatar(function () {
-              typeSeq([
+            var intro = el('intro');
+            print(intro);
+            var textCol = document.createElement('div');
+            textCol.className = 'introtext';
+            revealAvatar(intro, function () {
+              intro.appendChild(textCol);
+              typeInto(textCol, [
                 { t: 'line ascii', s: bannerLine() },
-                { t: 'blank' },
                 { t: 'line', s: nameLine() },
-                { t: 'line dim', s: coLine() },
-                { t: 'blank' },
-                { t: 'line', s: T().hint }
+                { t: 'line dim', s: coLine() }
               ], 12, function () {
-                var helpLines = [];
-                sink = helpLines;
-                printHelp();
-                sink = null;
-                playLines(helpLines, 9, function () {
-                  blank();
-                  busy = false;
-                  focusInp();
+                blank();
+                typeSeq([{ t: 'line', s: T().hint }], 12, function () {
+                  var helpLines = [];
+                  sink = helpLines;
+                  printHelp();
+                  sink = null;
+                  playLines(helpLines, 9, function () {
+                    blank();
+                    busy = false;
+                    focusInp();
+                  });
                 });
               });
             });
