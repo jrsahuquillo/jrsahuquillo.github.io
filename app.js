@@ -44,7 +44,7 @@
         'the architecture and the final call my own. Strong fundamentals are what',
         'make that leverage reliable.',
         '',
-        'I care about clean code, TDD, and getting the small details right.'
+        'I care about clean code, TDD, usability and user experience, and getting the small details right.'
       ],
       experience: [
         ['237 Global', 'Software Engineer', '2022 — present'],
@@ -100,7 +100,7 @@
         'arquitectura y la última decisión en mi mano. Unos buenos fundamentos',
         'son lo que hace fiable esa palanca.',
         '',
-        'Me importa el código limpio, el TDD y cuidar los detalles.'
+        'Me importa el código limpio, el TDD, la usabilidad y la experiencia de usuario, y cuidar los detalles.'
       ],
       experience: [
         ['237 Global', 'Ingeniero de Software', '2022 — actualidad'],
