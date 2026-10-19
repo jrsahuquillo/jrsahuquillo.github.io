@@ -209,6 +209,8 @@
       box-shadow: var(--glow);
       animation: blink 1.05s steps(1) infinite;
     }
+    .bootrow { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 20px; row-gap: 2px; }
+    .boot-title, .boot-load { white-space: nowrap; }
 
     .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
     .chip {
@@ -827,9 +829,7 @@
       }
 
       // One line that updates in place: "loading <module> [bar] NN%"
-      function playLoader(done) {
-        var node = el('line dim');
-        print(node);
+      function playLoader(node, done) {
         node.classList.add('typing');
         var width = barWidth();
         function render(label, pct) {
@@ -912,10 +912,16 @@
       function playBoot() {
         busy = true;
         skip = false;
-        var title = el('line dim');
-        print(title);
-        typeNode(title, '<span class="dim">' + esc(T().booting) + '</span>', 14, function () {
-          playLoader(function () {
+        var row = el('line bootrow');
+        var titleEl = document.createElement('span');
+        titleEl.className = 'boot-title dim';
+        var loadEl = document.createElement('span');
+        loadEl.className = 'boot-load';
+        row.appendChild(titleEl);
+        row.appendChild(loadEl);
+        print(row);
+        typeNode(titleEl, esc(T().booting), 14, function () {
+          playLoader(loadEl, function () {
             blank();
             revealAvatar(function () {
               typeSeq([
