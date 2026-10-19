@@ -815,10 +815,13 @@
 
       // Modules shown by the one-line loader (and the main commands)
       var MODULES = ['about', 'whoami', 'experience', 'skills', 'languages', 'motto', 'contact', 'photo'];
-      var LOAD_DT = 200; // ms per module — tweak to taste
+      var LOAD_DT = 300; // ms per module — tweak to taste
 
-      function loaderBar(pct) {
-        var width = 16;
+      // Bar length adapts to the viewport (longer on wide screens)
+      function barWidth() {
+        return Math.max(14, Math.min(36, Math.round(window.innerWidth / 26)));
+      }
+      function loaderBar(pct, width) {
         var fill = Math.round(pct / 100 * width);
         return '\u2588'.repeat(fill) + '\u2591'.repeat(width - fill);
       }
@@ -828,10 +831,11 @@
         var node = el('line dim');
         print(node);
         node.classList.add('typing');
+        var width = barWidth();
         function render(label, pct) {
           var pctStr = ('   ' + pct).slice(-3); // fixed width so it never shifts
           node.innerHTML =
-            '<span class="bright">[' + loaderBar(pct) + ']</span> ' +
+            '<span class="bright">[' + loaderBar(pct, width) + ']</span> ' +
             '<span class="amber">' + pctStr + '%</span>  ' +
             '<span class="dim">' + esc(label) + '</span>';
           term.scrollTop = term.scrollHeight;
