@@ -162,6 +162,16 @@
       background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, .22) 2px 3px);
       box-shadow: inset 0 0 22px rgba(0, 0, 0, .55);
     }
+    .avatar.reveal { overflow: hidden; }
+    .avatar .scanedge {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--bright);
+      box-shadow: var(--glow);
+      pointer-events: none;
+    }
 
     /* Input line */
     .inputline { display: flex; align-items: baseline; gap: 8px; padding: 2px 18px 18px; }
@@ -421,12 +431,9 @@
             ['help', 'this list']
           ],
           hint: '<span class="dim">type</span> <span class="cmd">help</span> <span class="dim">to begin, or click a command below.</span>',
-          boot: [
-            'SahuquilloOS 2.0  ·  booting…',
-            '[ ok ]  mounting /experience',
-            '[ ok ]  loading ruby, rails, postgres',
-            '[ ok ]  warming phosphor tube'
-          ],
+          loadingWord: 'loading',
+          readyWord: 'ready',
+          booting: 'SahuquilloOS 2.0  ·  booting…',
           notfound: function (k) {
             return '<span class="amber">command not found:</span> ' + k +
               ' <span class="dim">— type</span> <span class="cmd">help</span>';
@@ -479,12 +486,9 @@
             ['help', 'esta lista']
           ],
           hint: '<span class="dim">escribe</span> <span class="cmd">help</span> <span class="dim">para empezar, o pulsa un comando abajo.</span>',
-          boot: [
-            'SahuquilloOS 2.0  ·  arrancando…',
-            '[ ok ]  montando /experiencia',
-            '[ ok ]  cargando ruby, rails, postgres',
-            '[ ok ]  calentando tubo de fósforo'
-          ],
+          loadingWord: 'cargando',
+          readyWord: 'listo',
+          booting: 'SahuquilloOS 2.0  ·  arrancando…',
           notfound: function (k) {
             return '<span class="amber">comando no encontrado:</span> ' + k +
               ' <span class="dim">— escribe</span> <span class="cmd">help</span>';
@@ -809,34 +813,84 @@
         })(0);
       }
 
-      function playBoot() {
-        busy = true;
-        skip = false;
-        var seq = [];
-        T().boot.forEach(function (s) { seq.push({ t: 'line dim', s: s }); });
-        seq.push({ t: 'blank' });
-        seq.push({ t: 'avatar' });
-        seq.push({ t: 'line ascii', s: bannerLine() });
-        seq.push({ t: 'blank' });
-        seq.push({ t: 'line', s: nameLine() });
-        seq.push({ t: 'line dim', s: coLine() });
-        seq.push({ t: 'blank' });
-        seq.push({ t: 'line', s: T().hint });
+      // Modules shown by the one-line loader (and the main commands)
+      var MODULES = ['about', 'whoami', 'experience', 'skills', 'languages', 'motto', 'contact', 'photo'];
+      var LOAD_DT = 200; // ms per module — tweak to taste
 
+      function loaderBar(pct) {
+        var width = 16;
+        var fill = Math.round(pct / 100 * width);
+        return '\u2588'.repeat(fill) + '\u2591'.repeat(width - fill);
+      }
+
+      // One line that updates in place: "loading <module> [bar] NN%"
+      function playLoader(done) {
+        var node = el('line dim');
+        print(node);
+        node.classList.add('typing');
+        function render(label, pct) {
+          node.innerHTML =
+            '<span class="dim">' + esc(label) + '</span>  ' +
+            '<span class="bright">' + loaderBar(pct) + '</span> ' +
+            '<span class="amber">' + pct + '%</span>';
+          term.scrollTop = term.scrollHeight;
+        }
+        var i = 0;
+        (function tick() {
+          if (skip) {
+            render(T().readyWord, 100);
+            node.classList.remove('typing');
+            done();
+            return;
+          }
+          if (i < MODULES.length) {
+            render(T().loadingWord + ' ' + MODULES[i], Math.round((i + 1) / MODULES.length * 100));
+            i++;
+            setTimeout(tick, LOAD_DT);
+          } else {
+            render(T().readyWord, 100);
+            node.classList.remove('typing');
+            setTimeout(done, LOAD_DT);
+          }
+        })();
+      }
+
+      // Draw the portrait top-to-bottom, like it is being rendered line by line
+      function revealAvatar(done) {
+        var wrap = el('avatar reveal');
+        var img = document.createElement('img');
+        img.src = AVATAR;
+        img.alt = 'José Ramón Sahuquillo';
+        wrap.appendChild(img);
+        var edge = document.createElement('span');
+        edge.className = 'scanedge';
+        wrap.appendChild(edge);
+        print(wrap);
+        var full = (window.innerWidth <= 620 ? 120 : 150);
+        function finish() {
+          wrap.classList.remove('reveal');
+          wrap.style.height = '';
+          edge.remove();
+          done();
+        }
+        if (reduce) { finish(); return; }
+        var h = 0;
+        var stepPx = Math.max(4, Math.round(full / 24));
+        wrap.style.height = '0px';
+        (function grow() {
+          if (skip) { finish(); return; }
+          wrap.style.height = h + 'px';
+          edge.style.top = h + 'px';
+          if (h >= full) { finish(); return; }
+          h = Math.min(full, h + stepPx);
+          setTimeout(grow, 22);
+        })();
+      }
+
+      function typeSeq(items, speed, done) {
         (function step(k) {
-          if (k >= seq.length) {
-            printHelp();
-            blank();
-            busy = false;
-            focusInp();
-            return;
-          }
-          var b = seq[k];
-          if (b.t === 'avatar') {
-            print(avatarNode());
-            setTimeout(function () { step(k + 1); }, (reduce || skip) ? 0 : 140);
-            return;
-          }
+          if (k >= items.length) { done(); return; }
+          var b = items[k];
           if (b.t === 'blank') {
             blank();
             setTimeout(function () { step(k + 1); }, skip ? 0 : 60);
@@ -844,10 +898,37 @@
           }
           var node = el(b.t);
           print(node);
-          typeNode(node, b.s, 12, function () {
+          typeNode(node, b.s, speed, function () {
             setTimeout(function () { step(k + 1); }, (reduce || skip) ? 0 : 70);
           });
         })(0);
+      }
+
+      function playBoot() {
+        busy = true;
+        skip = false;
+        var title = el('line dim');
+        print(title);
+        typeNode(title, '<span class="dim">' + esc(T().booting) + '</span>', 14, function () {
+          playLoader(function () {
+            blank();
+            revealAvatar(function () {
+              typeSeq([
+                { t: 'line ascii', s: bannerLine() },
+                { t: 'blank' },
+                { t: 'line', s: nameLine() },
+                { t: 'line dim', s: coLine() },
+                { t: 'blank' },
+                { t: 'line', s: T().hint }
+              ], 12, function () {
+                printHelp();
+                blank();
+                busy = false;
+                focusInp();
+              });
+            });
+          });
+        });
       }
 
       // ----- Blinking-cursor favicon -----
